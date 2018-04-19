@@ -14,7 +14,7 @@ __all__ = ('gradient_flow_solver',)
 
 
 def gradient_flow_solver(x, f, g, action, niter, line_search=1,
-                         Ainv=None, callback=None, method='compose'):
+                         Ainv=None, callback=None):
     """Gradient flow solver for diffeomorphic image reconstruction.
 
     Notes
@@ -32,7 +32,6 @@ def gradient_flow_solver(x, f, g, action, niter, line_search=1,
     assert x in f.domain
     assert action.domain == f.domain
     assert action.lie_group == g.lie_group
-    assert method in ('compose', 'add')
 
     if not callable(line_search):
         line_search = odl.solvers.ConstantLineSearch(line_search)

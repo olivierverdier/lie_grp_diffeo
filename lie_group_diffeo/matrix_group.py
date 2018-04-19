@@ -359,14 +359,14 @@ class MatrixImageAction(LieAction):
         assert lie_grp_element in self.lie_group
         pts = self.domain.points()
         deformed_pts = lie_grp_element.arr.dot(pts.T) - pts.T
-        deformed_pts = self.domain.tangent_bundle.element(deformed_pts)
+        deformed_pts = self.domain.tangent_bundle.element(np.reshape(deformed_pts, self.domain.tangent_bundle.shape))
         return odl.deform.LinDeformFixedDisp(deformed_pts)
 
     def inf_action(self, lie_alg_element):
         assert lie_alg_element in self.lie_group.associated_algebra
         pts = self.domain.points()
         deformed_pts = lie_alg_element.arr.dot(pts.T) - pts.T
-        deformed_pts = self.domain.tangent_bundle.element(deformed_pts)
+        deformed_pts = self.domain.tangent_bundle.element(np.reshape(deformed_pts, self.domain.tangent_bundle.shape))
         pointwise_inner = odl.PointwiseInner(self.gradient.range, deformed_pts)
         return pointwise_inner * self.gradient
 
@@ -374,7 +374,7 @@ class MatrixImageAction(LieAction):
         assert v in self.domain
         assert m in self.domain
         size = self.lie_group.size
-        pts = self.domain.tangent_bundle.element(self.domain.points().T)
+        pts = self.domain.tangent_bundle.element(np.reshape(self.domain.points().T, self.domain.tangent_bundle.shape))
         gradv = self.gradient(v)
         result = np.zeros([size, size])
         for i in range(size):
@@ -460,7 +460,8 @@ class MatrixImageAffineAction(LieAction):
         pts = self.domain.points()
         deformed_pts = lie_grp_element.arr[:-1, :-1].dot(pts.T) - pts.T
         deformed_pts += lie_grp_element.arr[:-1, -1][:, None]
-        deformed_pts = self.domain.tangent_bundle.element(deformed_pts)
+        shape = self.domain.tangent_bundle.shape
+        deformed_pts = self.domain.tangent_bundle.element(np.reshape(deformed_pts, shape))
         return odl.deform.LinDeformFixedDisp(deformed_pts)
 
     def inf_action(self, lie_alg_element):
@@ -468,7 +469,8 @@ class MatrixImageAffineAction(LieAction):
         pts = self.domain.points()
         deformed_pts = lie_alg_element.arr[:-1, :-1].dot(pts.T) - pts.T
         deformed_pts += lie_alg_element.arr[:-1, -1][:, None]
-        deformed_pts = self.domain.tangent_bundle.element(deformed_pts)
+        shape = self.domain.tangent_bundle.shape
+        deformed_pts = self.domain.tangent_bundle.element(np.reshape(deformed_pts, shape))
         pointwise_inner = odl.PointwiseInner(self.gradient.range, deformed_pts)
         return pointwise_inner * self.gradient
 
@@ -476,7 +478,8 @@ class MatrixImageAffineAction(LieAction):
         assert v in self.domain
         assert m in self.domain
         size = self.lie_group.size
-        pts = self.domain.tangent_bundle.element(self.domain.points().T)
+        shape = self.domain.tangent_bundle.shape
+        pts = self.domain.tangent_bundle.element(np.reshape(self.domain.points().T, shape))
         gradv = self.gradient(v)
         result = np.zeros([size, size])
         for i in range(size - 1):

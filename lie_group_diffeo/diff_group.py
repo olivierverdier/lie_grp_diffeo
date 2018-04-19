@@ -57,7 +57,7 @@ class Diff(LieGroup):
     @property
     def identity(self):
         """The mapping x -> x."""
-        pts = self.coord_space[0].points().T
+        pts = self.coord_space[0].points().T.reshape(self.coord_space.shape)
         return self.element(pts, pts)
 
     @property
@@ -92,7 +92,8 @@ class DiffElement(LieGroupElement):
         def_pts = [dati.interpolation(pts) for dati in self.data]
         pts_inv = _pspace_el_asarray(self.data_inv)
         def_pts_inv = [dati.interpolation(pts_inv) for dati in other.data_inv]
-        return self.lie_group.element(def_pts, def_pts_inv)
+        shape = self.lie_group.coord_space.shape
+        return self.lie_group.element(np.reshape(def_pts, shape), np.reshape(def_pts_inv, shape))
 
     def __repr__(self):
         return '{!r}.element({!r})'.format(self.lie_group, self.data)
@@ -138,9 +139,10 @@ class DiffAlgebra(LieAlgebra):
 
     def exp(self, el):
         """Exponential map via addition."""
-        pts = self.data_space[0].points().T
         increment = _pspace_el_asarray(el.data)
-        return self.lie_group.element(pts + increment, pts - increment)
+        pts = self.data_space[0].points().T.reshape(self.data_space.shape)
+        increment = el
+        return self.lie_group.element((pts + increment).data, (pts - increment).data)
 
     def __eq__(self, other):
         return (isinstance(other, DiffAlgebra) and
@@ -174,7 +176,8 @@ class GeometricDeformationAction(LieAction):
 
     def action(self, lie_grp_element):
         assert lie_grp_element in self.lie_group
-        pts = self.domain.points().T
+        shape = self.lie_group.coord_space.shape
+        pts = np.reshape(self.domain.points().T, shape)
         pts = self.lie_group.coord_space.element(pts)
         deformed_pts = lie_grp_element.data - pts
         return odl.deform.LinDeformFixedDisp(deformed_pts,

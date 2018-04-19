@@ -1,0 +1,41 @@
+import lie_group_diffeo as lgd
+import odl
+import numpy as np
+
+def test():
+
+    space = odl.uniform_discr(-1, 1, 1000, interp='linear')
+
+    # Define template
+    template = space.element(lambda x: np.exp(-x**2 / 0.2**2))
+    target = space.element(lambda x: np.exp(-(x-0.1)**2 / 0.3**2))
+
+    # Define data matching functional
+    data_matching = odl.solvers.L1Norm(space).translated(target)
+
+    lie_grp = lgd.Diff(space)
+    deform_action = lgd.GeometricDeformationAction(lie_grp, space)
+
+    # Initial guess
+    g = lie_grp.identity
+
+    # Combine action and functional into single object.
+    action = deform_action
+    x = template.copy()
+    f = data_matching
+
+    # Show some results, reuse the plot
+    # fig = template.show()
+    # target.show(fig=fig)
+
+    # Create callback that displays the current iterate and prints the function
+    # value
+    # callback = odl.solvers.CallbackShow('diffemorphic matching', step=50,
+    #                                     fig=fig)
+    # callback &= odl.solvers.CallbackPrint(f)
+
+    # Solve via gradient flow
+    result = lgd.gradient_flow_solver(x, f, g, action,
+                                    niter=5, line_search=0.0001)
+
+    # result.data.show('Resulting diffeo')

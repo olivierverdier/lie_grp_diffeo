@@ -8,6 +8,8 @@ standard_library.install_aliases()
 
 import odl
 
+from odl.set.space import LinearSpaceElement
+
 
 __all__ = ('LieGroup', 'LieAlgebra')
 
@@ -72,7 +74,7 @@ class LieAlgebra(odl.LinearSpace):
                 self.lie_group == other.lie_group)
 
 
-class LieAlgebraElement(odl.LinearSpaceElement):
+class LieAlgebraElement(LinearSpaceElement):
     @property
     def lie_algebra(self):
         return self.space

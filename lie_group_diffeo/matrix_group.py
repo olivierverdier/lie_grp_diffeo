@@ -295,7 +295,7 @@ class EuclideanGroup(MatrixGroup):
 
     def __repr__(self):
         """Return ``repr(self).``"""
-        return '{}({})'.format(self.__class__.__group__, self.size - 1)
+        return '{}({})'.format(self.__class__.__name__, self.size - 1)
 
 
 class EuclideanGroupElement(MatrixGroupElement):
